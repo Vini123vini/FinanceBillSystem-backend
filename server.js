@@ -6,15 +6,15 @@ require('dotenv').config();
 
 const app = express();
 
-app.use(cors({ 
-  origin: ['https://finance-bill-system-frontend.vercel.app', 'http://localhost:5173'],
-  credentials: true 
-}));
+// ─── CORS — works for all devices ────────────────────────
+app.use(cors({ origin: true, credentials: true }));
+app.options('*', cors({ origin: true, credentials: true }));
+
 app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ extended: true }));
 if (process.env.NODE_ENV !== 'production') app.use(morgan('dev'));
 
-// Routes
+// ─── Routes ──────────────────────────────────────────────
 app.use('/api/auth',      require('./routes/auth'));
 app.use('/api/dashboard', require('./routes/dashboard'));
 app.use('/api/clients',   require('./routes/clients'));
@@ -30,6 +30,7 @@ app.use((err, req, res, next) => {
   res.status(err.status || 500).json({ success: false, message: err.message || 'Server Error' });
 });
 
+// ─── Start ────────────────────────────────────────────────
 const PORT = process.env.PORT || 5000;
 mongoose.connect(process.env.MONGODB_URI)
   .then(() => {
